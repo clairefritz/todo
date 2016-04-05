@@ -8,7 +8,7 @@
  */
 
 // Model types
-class User {}
+/*class User {}
 class Widget {}
 
 // Mock data
@@ -30,4 +30,63 @@ module.exports = {
   getWidgets: () => widgets,
   User,
   Widget,
+};
+*/
+
+// Model types
+class TodoItem {}
+class User {}
+
+// mock data
+const todoItems = [];
+const users = [];
+let todoId = 1;
+
+const user = new User();
+user.id = 1;
+user.name = 'Claire Fritz';
+user.todos = [];
+users.push(user);
+
+function getUser(id) {
+  return users.find((user)=> user.id === id);
+}
+
+addTodo(1, 'Learn Relay');
+addTodo(1, 'Populate the database');
+addTodo(1, 'Add more to-dos');
+
+function addTodo(userId, content) {
+  const todoItem = new TodoItem();
+  todoItem.id = todoId++;
+  todoItem.content = content;
+  todoItem.time = new Date();
+  todoItems.push(todoItem);
+  users.find((user) => {
+    if (user.id == userId) user.todos.push(todoItem.id)
+  });
+  return todoItem.id;
+}
+
+function getTodo(id) {
+  return todoItems.find((todo) => todo.id === id);
+}
+function editTodo(id, content) {}
+function deleteTodo(id) {}
+function getTodosByUser(id) {
+  let user = getUser(id);
+  return todoItems.filter((item)=> {
+    return user.todos.find((id)=> id === item.id)
+  });
+}
+
+module.exports = {
+  User: User,
+  TodoItem: TodoItem,
+  addTodo: addTodo,
+  editTodo: editTodo,
+  deleteTodo: deleteTodo,
+  getTodosByUser: getTodosByUser,
+  getUser: getUser,
+  getTodo: getTodo
 };
