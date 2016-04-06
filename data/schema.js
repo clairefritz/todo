@@ -70,6 +70,10 @@ var userType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The name of the user'
     },
+    avatar: {
+      type: GraphQLString,
+      description: 'Avatar path'
+    },
     todos: {
       type: todoConnection,
       description: 'A person\'s collection of todos',
@@ -120,6 +124,10 @@ var queryType = new GraphQLObjectType({
     user: {
       type: userType,
       resolve: () => getUser(1)
+    },
+    todo: {
+      type: todoType,
+      resolve: () => getTodosByUser(1)
     }
   })
 });
@@ -134,27 +142,49 @@ const AddTodoMutation = mutationWithClientMutationId({
     newTodoEdge: {
       type: TodoEdge,
       resolve: ({userId, localTodoId}) => {
-        console.log('outputFields.todo.resolve', localTodoId, getTodosByUser(fromGlobalId(userId)));
         const newTodo = getTodo(localTodoId);
         return {
-          cursor: cursorForObjectInConnection(getTodosByUser(fromGlobalId(userId)), newTodo),
+          cursor: cursorForObjectInConnection(getTodosByUser(userId), newTodo),
           node: newTodo
         }
       }
     },
     user: {
       type: userType,
-      resolve: ({userId}) => {
-        console.log('blabla user', userId);
-        getUser(userId);
-      }
+      resolve: ({userId}) => getUser(userId)
     }
   },
   mutateAndGetPayload: ({userId, content}) => {
     const localTodoId = addTodo(fromGlobalId(userId).id, content);
-    console.log(localTodoId, content, userId);
     return {localTodoId, userId};
   }
+});
+
+const DeleteTodoMutation = mutationWithClientMutationId({
+  name: 'DeleteTodo',
+  inputFields: {
+    id: {type: new GraphQLNonNull(GraphQLID)},
+    userId: {type: new GraphQLNonNull(GraphQLString)}
+  },
+  outputFields: {
+    deletedTodoId: {
+      type: GraphQLID,
+      resolve: ({id, userId}) => getUser(userId)
+    },
+    user: {
+      type: userType,
+      resolve: ({userId}) => getUser(userId)
+    }
+  },
+  mutateAndGetPayload: ({id, userId}) => {
+    const localTodoId = fromGlobalId(id).id;
+    deleteTodo(localTodoId);
+    return {id, userId};
+  }
+});
+
+const EditTodoMutation = mutationWithClientMutationId({
+  name: 'EditTodo'
 });
 
 
@@ -165,7 +195,9 @@ const AddTodoMutation = mutationWithClientMutationId({
 var mutationType = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    addTodo: AddTodoMutation
+    addTodo: AddTodoMutation,
+    deleteTodo: DeleteTodoMutation,
+    editTodo: EditTodoMutation
   })
 });
 

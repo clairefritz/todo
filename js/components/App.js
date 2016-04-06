@@ -21,16 +21,17 @@ class App extends React.Component {
     this.props.relay.setVariables({newTodo: true});
   };
   render() {
+    console.log(this.props);
     return (
       <div>
         <h1>To-do list</h1>
+        <TodoInput handleChange={this._handleChange}/>
         <TodoCount count={this.props.user.todos.edges.length}/>
         <ul>
           {this.props.user.todos.edges.map(({node}) =>
-            <li key={node.id}><TodoItem todo={node}/></li>
+            <TodoItem key={node.id} todo={node} user={this.props.user}/>
           )}
         </ul>
-        <TodoInput handleChange={this._handleChange}/>
       </div>
     );
   }
@@ -45,6 +46,8 @@ export default Relay.createContainer(App, {
     user: (variables) => Relay.QL`
       fragment on User {
         id,
+        name,
+        avatar,
         todos(userId: $userId) {
           edges {
             node {
@@ -54,8 +57,9 @@ export default Relay.createContainer(App, {
             },
           },
         },
+        ${AddTodoMutation.getFragment('user').if(variables.newTodo)}
       }
-    `,
-  },
-}); //         ${AddTodoMutation.getFragment('user').if(variables.newTodo)}
+    `
+  }
+});
 

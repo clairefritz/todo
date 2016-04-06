@@ -2,7 +2,7 @@ import React from 'react';
 
 export default class TodoInput extends React.Component {
   static propTypes = {
-    handleChange: React.PropTypes.func.isRequired,
+    handleChange: React.PropTypes.func.isRequired
   };
   render() {
     return (

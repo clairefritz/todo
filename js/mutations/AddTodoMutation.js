@@ -15,11 +15,15 @@ export default class AddTodoMutation extends Relay.Mutation {
   }
 
   static fragments = {
-    user: () => Relay.QL`
-      fragment on User {
-        todos
+    user: () => {
+      return Relay.QL`fragment on User {
+        id,
+        name,
+        todos {
+          edges
+        }
       }
-    `
+    `}
   };
 
   // Specify the fields that might need updating once we get the payload
@@ -27,10 +31,16 @@ export default class AddTodoMutation extends Relay.Mutation {
   getFatQuery() {
     return Relay.QL`
       fragment on AddTodoPayload @relay(pattern: true) {
+        newTodoEdge,
         user {
-          todos
+          id,
+          name,
+          todos {
+            edges {
+              node
+            }
+          }
         },
-        newTodoEdge
       }
     `
   }

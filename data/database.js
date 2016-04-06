@@ -8,32 +8,6 @@
  */
 
 // Model types
-/*class User {}
-class Widget {}
-
-// Mock data
-var viewer = new User();
-viewer.id = '1';
-viewer.name = 'Anonymous';
-var widgets = ['What\'s-it', 'Who\'s-it', 'How\'s-it'].map((name, i) => {
-  var widget = new Widget();
-  widget.name = name;
-  widget.id = `${i}`;
-  return widget;
-});
-
-module.exports = {
-  // Export methods that your schema can use to interact with your database
-  getUser: (id) => id === viewer.id ? viewer : null,
-  getViewer: () => viewer,
-  getWidget: (id) => widgets.find(w => w.id === id),
-  getWidgets: () => widgets,
-  User,
-  Widget,
-};
-*/
-
-// Model types
 class TodoItem {}
 class User {}
 
@@ -45,6 +19,7 @@ let todoId = 1;
 const user = new User();
 user.id = 1;
 user.name = 'Claire Fritz';
+user.avatar = '';
 user.todos = [];
 users.push(user);
 
@@ -60,7 +35,7 @@ function addTodo(userId, content) {
   const todoItem = new TodoItem();
   todoItem.id = todoId++;
   todoItem.content = content;
-  todoItem.time = new Date();
+  todoItem.time = new Date().toISOString();
   todoItems.push(todoItem);
   users.find((user) => {
     if (user.id == userId) user.todos.push(todoItem.id)
