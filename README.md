@@ -6,6 +6,7 @@ This kit includes an app server, a GraphQL server, and a transpiler that you can
 
 ```
 npm install
+npm run sass
 ```
 
 ## Running
