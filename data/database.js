@@ -17,6 +17,7 @@ const users = [];
 let todoId = 1;
 
 const user = new User();
+// a mock user
 user.id = 1;
 user.name = 'Claire Fritz';
 user.avatar = '';
@@ -27,9 +28,10 @@ function getUser(id) {
   return users.find((user)=> user.id === id);
 }
 
+// some mock data
 addTodo(1, 'Learn Relay');
-addTodo(1, 'Populate the database');
 addTodo(1, 'Add more to-dos');
+addTodo(1, 'Finish the app');
 
 function addTodo(userId, content) {
   const todoItem = new TodoItem();
@@ -46,8 +48,14 @@ function addTodo(userId, content) {
 function getTodo(id) {
   return todoItems.find((todo) => todo.id === id);
 }
-function editTodo(id, content) {}
-function deleteTodo(id) {}
+function editTodo(id, content) {
+  //TODO: get the todo + replace its content + (eventually update the timestamp)
+}
+function deleteTodo(id, userId) {
+  delete todoItems[id];
+  let user = getUser(userId);
+  return user.todos.splice(user.todo.indexOf(id), 1);
+}
 function getTodosByUser(id) {
   let user = getUser(id);
   return todoItems.filter((item)=> {
