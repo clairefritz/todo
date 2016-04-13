@@ -16,16 +16,16 @@ const todoItems = [];
 const users = [];
 let todoId = 1;
 
-const user = new User();
+const newUser = new User();
 // a mock user
-user.id = 1;
-user.name = 'Claire Fritz';
-user.avatar = '';
-user.todos = [];
-users.push(user);
+newUser.id = 1;
+newUser.name = 'Claire Fritz';
+newUser.avatar = '';
+newUser.todos = [];
+users.push(newUser);
 
 function getUser(id) {
-  return users.find((user)=> user.id === id);
+  return users.find((user)=> user.id == id);
 }
 
 // some mock data
@@ -54,7 +54,7 @@ function editTodo(id, content) {
 function deleteTodo(id, userId) {
   delete todoItems[id];
   let user = getUser(userId);
-  return user.todos.splice(user.todo.indexOf(id), 1);
+  return user.todos.splice(user.todos.indexOf(id), 1);
 }
 function getTodosByUser(id) {
   let user = getUser(id);

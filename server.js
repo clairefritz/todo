@@ -16,6 +16,11 @@ graphQLServer.use('/', graphQLHTTP({
   graphiql: true,
   pretty: true,
   schema: Schema,
+  formatError: error => ({
+    message: error.message,
+    locations: error.locations,
+    stack: error.stack
+  })
 }));
 graphQLServer.listen(GRAPHQL_PORT, () => console.log(
   `GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`

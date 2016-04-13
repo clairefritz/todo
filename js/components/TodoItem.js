@@ -20,8 +20,8 @@ export default class TodoItem extends React.Component {
           <UserAvatar user={this.props.user}/>
           <div className="col-xs-10 text-right content">
             <p>{this.props.todo.content}</p>
-            <a onClick={this._editTodo} className="todo-item-edit text-info">edit</a>
-            <a onClick={this._deleteTodo} className="todo-item-delete text-danger">delete</a>
+            <a onClick={this._editTodo} className="todo-item-edit text-info"><span className="glyphicon glyphicon-pencil"></span>edit</a>
+            <a onClick={this._deleteTodo} className="todo-item-delete text-danger"><span className="glyphicon glyphicon-trash"></span>delete</a>
           </div>
           <small className="col-xs-10 col-xs-offset-2 text-right">{date}</small>
         </div>

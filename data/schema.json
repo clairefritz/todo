@@ -52,18 +52,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "todos",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "TodoItem",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -248,7 +236,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "TodoItemConnection",
+                "name": "TodoConnection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -278,7 +266,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "TodoItemConnection",
+          "name": "TodoConnection",
           "description": "A connection to a list of items.",
           "fields": [
             {
@@ -306,7 +294,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "TodoItemEdge",
+                  "name": "TodoEdge",
                   "ofType": null
                 }
               },
@@ -398,7 +386,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "TodoItemEdge",
+          "name": "TodoEdge",
           "description": "An edge in a connection.",
           "fields": [
             {
@@ -687,7 +675,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "TodoItemEdge",
+                "name": "TodoEdge",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -734,7 +722,7 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "id",
+              "name": "itemId",
               "description": null,
               "type": {
                 "kind": "NON_NULL",
@@ -786,7 +774,7 @@
           "description": null,
           "fields": [
             {
-              "name": "user",
+              "name": "changedUser",
               "description": null,
               "args": [],
               "type": {

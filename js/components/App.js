@@ -22,7 +22,7 @@ class App extends React.Component {
   };
   _deleteTodo = (todoId) => {
     Relay.Store.commitUpdate(new DeleteTodoMutation({
-      id: todoId,
+      itemId: todoId,
       user: this.props.user
     }));
   };
