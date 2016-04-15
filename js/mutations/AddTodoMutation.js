@@ -9,7 +9,7 @@ export default class AddTodoMutation extends Relay.Mutation {
   // Prepare the variables to be sent as "inputFields" to the mutation
   getVariables() {
     return {
-      user: this.props.user,
+      user: this.props.user.id,
       content: this.props.content
     }
   }
@@ -21,13 +21,7 @@ export default class AddTodoMutation extends Relay.Mutation {
         name,
         avatar,
         todos(userId: 1) {
-          edges {
-            node {
-              id,
-              content,
-              time,
-            },
-          },
+          edges
         },
       }
     `
@@ -38,17 +32,18 @@ export default class AddTodoMutation extends Relay.Mutation {
   getFatQuery() {
     return Relay.QL`
       fragment on AddTodoPayload @relay(pattern: true) {
-        user {
+        changedUser {
+          id,
           todos {
             edges {
               node {
                 content,
-                id,
-                time
+                time,
+                id
               }
             }
           }
-        },
+        }
       }
     `
   }
@@ -59,14 +54,14 @@ export default class AddTodoMutation extends Relay.Mutation {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
-        user: this.props.user.id
+        changedUser: this.props.user.id
       }
     }]
   }
 
   getOptimisticResponse() {
     return {
-      user: this.props.user
+      changedUser: this.props.user
     };
   }
 }

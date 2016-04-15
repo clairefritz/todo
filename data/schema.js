@@ -43,10 +43,6 @@ import {
   getTodo
 } from './database';
 
-import {
-  createInputObject
-} from './helpers'
-
 /**
  * We get the node interface and field from the Relay library.
  *
@@ -125,21 +121,6 @@ var userType = new GraphQLObjectType({
   interfaces: [nodeInterface]
 });
 
-
-
-var userInputType = new GraphQLInputObjectType({
-  name: 'UserInput',
-  fields: () => ({
-    id: globalIdField('User'),
-    name: {type: GraphQLString},
-    avatar: {type: GraphQLString},
-    todos: {
-      type: createInputObject(todoType)
-    }
-  }),
-  interfaces: [nodeInterface]
-});
-
 /**
  * This is the type that will be the root of our query,
  * and the entry point into our schema.
@@ -151,11 +132,7 @@ var queryType = new GraphQLObjectType({
     user: {
       type: userType,
       resolve: () => getUser(1)
-    },
-    /*todos: {
-      type: todoType,
-      resolve: () => getTodosByUser(1)
-    }*/
+    }
   })
 });
 
@@ -163,16 +140,12 @@ const AddTodoMutation = mutationWithClientMutationId({
   name: 'AddTodo',
   // incoming values
   inputFields: {
-    user: {type: userInputType},
+    user: {type: new GraphQLNonNull(GraphQLString)},
     content: {type: new GraphQLNonNull(GraphQLString)}
   },
   // outcoming values
   outputFields: {
-    newTodoEdge: {
-      type: TodoEdge,
-      resolve: ({userId})=> getTodosByUser(userId)
-    },
-    user: {
+    changedUser: {
       type: userType,
       resolve: ({userId}) => getUser(userId)
     }
@@ -180,8 +153,8 @@ const AddTodoMutation = mutationWithClientMutationId({
   // 1. proceed to updating the stored data
   // 2. return the payload that outputFields will need
   mutateAndGetPayload: ({user, content}) => {
-    let userId = user.id;
-    addTodo(fromGlobalId(userId).id, content);
+    let userId = fromGlobalId(user).id;
+    addTodo(userId, content);
     return {userId};
   }
 });

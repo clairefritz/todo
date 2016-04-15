@@ -34,7 +34,7 @@ addTodo(1, 'Add more to-dos');
 addTodo(1, 'Finish the app');
 
 function addTodo(userId, content) {
-  const todoItem = new TodoItem();
+  let todoItem = new TodoItem();
   todoItem.id = todoId++;
   todoItem.content = content;
   todoItem.time = new Date().toISOString();
