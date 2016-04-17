@@ -1,0 +1,76 @@
+html {
+  height: 100%;
+  color: $gray-darker;
+  body {
+    min-height: 100%;
+  }
+}
+
+.app {
+  height: 100vh;
+  padding: 15px;
+  > div {
+    height: 100%;
+  }
+}
+
+.todo-list {
+  position: absolute;
+  width: 100%;
+  top: 25px;
+  bottom: 25px;
+  padding: 0;
+  overflow: scroll;
+}
+
+.todo-item {
+  list-style-type: none;
+  margin-bottom: 10px;
+  .content {
+    min-height: $item-height;
+    background-color: $primary-50;
+    border-radius: 3px;
+    padding: 5px 8px;
+    // caret
+    &:before {
+      content: '';
+      display: block;
+      border: 6px solid transparent;
+      border-right-color: $primary-50;
+      border-right-width: 10px;
+      position: absolute;
+      left: -16px;
+      top: 13px;
+    }
+  }
+  a, p {
+    display: inline-block;
+    margin-left: .8em;
+  }
+}
+
+.user-avatar {
+  .avatar {
+    float: right;
+    width: $item-height;
+    height: $item-height;
+    border-radius: 50%;
+    line-height: $item-height;
+    background-color: $primary;
+    color: white;
+    text-align: center;
+  }
+}
+
+.todo-input {
+  &.bottom {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    left: 15px;
+    margin: 0 auto;
+  }
+  &.edit {
+    display: inline-block;
+  }
+}

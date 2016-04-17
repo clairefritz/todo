@@ -8,26 +8,76 @@
  */
 
 // Model types
+class TodoItem {}
 class User {}
-class Widget {}
 
-// Mock data
-var viewer = new User();
-viewer.id = '1';
-viewer.name = 'Anonymous';
-var widgets = ['What\'s-it', 'Who\'s-it', 'How\'s-it'].map((name, i) => {
-  var widget = new Widget();
-  widget.name = name;
-  widget.id = `${i}`;
-  return widget;
-});
+// mock data
+const todoItems = [];
+const users = [];
+let todoId = 1;
+
+const newUser = new User();
+// a mock user
+newUser.id = 1;
+newUser.name = 'Claire Fritz';
+newUser.avatar = '';
+newUser.todos = [];
+users.push(newUser);
+
+function getUser(id) {
+  return users.find((user)=> user.id == id);
+}
+
+// some mock data
+addTodo(1, 'Learn Relay');
+addTodo(1, 'Add more to-dos');
+addTodo(1, 'Finish the app');
+
+function addTodo(userId, content) {
+  let todoItem = new TodoItem();
+  todoItem.id = todoId++;
+  todoItem.content = content;
+  todoItem.time = new Date().toISOString();
+  todoItems.push(todoItem);
+  users.find((user) => {
+    if (user.id == userId) user.todos.push(todoItem.id)
+  });
+  return todoItem.id;
+}
+
+function getTodo(id) {
+  return todoItems.find((todo) => todo.id == id);
+}
+
+function editTodo(id, content) {
+  let todo = getTodo(id);
+  todo.content = content;
+  todo.time = new Date().toISOString();
+}
+
+function deleteTodo(id, userId) {
+  todoItems.forEach((todo, i, thisArray) => {
+    if (todo.id == id) thisArray.splice(i, 1);
+  });
+  return users.find((user) => {
+    if (user.id == userId) user.todos.splice(user.todos.indexOf(id), 1);
+  });
+}
+
+function getTodosByUser(id) {
+  let user = getUser(id);
+  return todoItems.filter((item)=> {
+    return user.todos.find((id)=> id === item.id)
+  });
+}
 
 module.exports = {
-  // Export methods that your schema can use to interact with your database
-  getUser: (id) => id === viewer.id ? viewer : null,
-  getViewer: () => viewer,
-  getWidget: (id) => widgets.find(w => w.id === id),
-  getWidgets: () => widgets,
-  User,
-  Widget,
+  User: User,
+  TodoItem: TodoItem,
+  addTodo: addTodo,
+  editTodo: editTodo,
+  deleteTodo: deleteTodo,
+  getTodosByUser: getTodosByUser,
+  getUser: getUser,
+  getTodo: getTodo
 };

@@ -1,15 +1,22 @@
-# Relay Starter Kit
+# To-list implementation
 
-This kit includes an app server, a GraphQL server, and a transpiler that you can use to get started building an app with Relay. For a walkthrough, see the [Relay tutorial](https://facebook.github.io/relay/docs/tutorial.html).
+This was built using Relay started kit (https://github.com/relayjs/relay-starter-kit)
 
-## Installation
+## Setup
+### Installation
 
 ```
 npm install
 npm run sass
 ```
 
-## Running
+### Compiling the CSS
+
+```
+npm run-script sass
+```
+
+### Running
 
 Start a local server:
 
@@ -17,7 +24,7 @@ Start a local server:
 npm start
 ```
 
-## Developing
+### Developing
 
 Any changes you make to files in the `js/` directory will cause the server to
 automatically rebuild the app and refresh your browser.
@@ -30,6 +37,6 @@ npm run update-schema
 npm start
 ```
 
-## License
+### License
 
 Relay Starter Kit is [BSD licensed](./LICENSE). We also provide an additional [patent grant](./PATENTS).

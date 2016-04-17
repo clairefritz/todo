@@ -15,6 +15,7 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLInputObjectType,
   GraphQLSchema,
   GraphQLString,
 } from 'graphql';
@@ -23,6 +24,7 @@ import {
   connectionArgs,
   connectionDefinitions,
   connectionFromArray,
+  cursorForObjectInConnection,
   fromGlobalId,
   globalIdField,
   mutationWithClientMutationId,
@@ -32,11 +34,13 @@ import {
 import {
   // Import methods that your schema can use to interact with your database
   User,
-  Widget,
+  TodoItem,
+  addTodo,
+  editTodo,
+  deleteTodo,
+  getTodosByUser,
   getUser,
-  getViewer,
-  getWidget,
-  getWidgets,
+  getTodo
 } from './database';
 
 /**
@@ -45,65 +49,77 @@ import {
  * The first method defines the way we resolve an ID to its object.
  * The second defines the way we resolve an object to its GraphQL type.
  */
+
+
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
-    if (type === 'User') {
-      return getUser(id);
-    } else if (type === 'Widget') {
-      return getWidget(id);
-    } else {
-      return null;
-    }
+    if (type === 'User') return getUser(id);
+    else if (type === 'TodoItem') return getTodosByUser(id);
   },
   (obj) => {
-    if (obj instanceof User) {
-      return userType;
-    } else if (obj instanceof Widget)  {
-      return widgetType;
-    } else {
-      return null;
-    }
+    return obj.todos ? userType : todoType;
   }
 );
 
+
 /**
- * Define your own types here
+ * type definitions
  */
+
+
+var todoType = new GraphQLObjectType({
+  name: 'TodoItem',
+  description: 'A to-do item',
+  isTypeOf: (obj) => obj instanceof TodoItem,
+  fields: () => ({
+    id: globalIdField('TodoItem'),
+    content: {
+      type: GraphQLString,
+      description: 'The to-do text'
+    },
+    time: {
+      type: GraphQLString,
+      description: 'Time and date of submission'
+    }
+  }),
+  interfaces: [nodeInterface]
+});
+
+
+/**
+ * Connection definition
+ */
+var {connectionType: todoConnection,
+  edgeType: TodoEdge} =
+  connectionDefinitions({name: 'Todo', nodeType: todoType});
 
 var userType = new GraphQLObjectType({
   name: 'User',
   description: 'A person who uses our app',
+  isTypeOf: (obj) => obj instanceof User,
   fields: () => ({
     id: globalIdField('User'),
-    widgets: {
-      type: widgetConnection,
-      description: 'A person\'s collection of widgets',
-      args: connectionArgs,
-      resolve: (_, args) => connectionFromArray(getWidgets(), args),
-    },
-  }),
-  interfaces: [nodeInterface],
-});
-
-var widgetType = new GraphQLObjectType({
-  name: 'Widget',
-  description: 'A shiny widget',
-  fields: () => ({
-    id: globalIdField('Widget'),
     name: {
       type: GraphQLString,
-      description: 'The name of the widget',
+      description: 'The name of the user'
     },
+    avatar: {
+      type: GraphQLString,
+      description: 'Avatar path'
+    },
+    todos: {
+      type: todoConnection,
+      description: 'A person\'s collection of todos',
+      args: {
+          userId: { type: GraphQLInt }
+        },
+        ...connectionArgs,
+      resolve: (user, {userId, ...args}) => connectionFromArray(getTodosByUser(userId), args)
+    }
   }),
-  interfaces: [nodeInterface],
+  interfaces: [nodeInterface]
 });
-
-/**
- * Define your own connection types here
- */
-var {connectionType: widgetConnection} =
-  connectionDefinitions({name: 'Widget', nodeType: widgetType});
 
 /**
  * This is the type that will be the root of our query,
@@ -113,13 +129,78 @@ var queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
     node: nodeField,
-    // Add your own root fields here
-    viewer: {
+    user: {
       type: userType,
-      resolve: () => getViewer(),
-    },
-  }),
+      resolve: () => getUser(1)
+    }
+  })
 });
+
+const AddTodoMutation = mutationWithClientMutationId({
+  name: 'AddTodo',
+  // incoming values
+  inputFields: {
+    user: {type: new GraphQLNonNull(GraphQLString)},
+    content: {type: new GraphQLNonNull(GraphQLString)}
+  },
+  // outcoming values
+  outputFields: {
+    changedUser: {
+      type: userType,
+      resolve: ({userId}) => getUser(userId)
+    }
+  },
+  // 1. proceed to updating the stored data
+  // 2. return the payload that outputFields will need
+  mutateAndGetPayload: ({user, content}) => {
+    let userId = parseFloat(fromGlobalId(user).id);
+    addTodo(userId, content);
+    return {userId};
+  }
+});
+
+const DeleteTodoMutation = mutationWithClientMutationId({
+  name: 'DeleteTodo',
+  inputFields: {
+    itemId: {type: new GraphQLNonNull(GraphQLID)},
+    user: {type: new GraphQLNonNull(GraphQLID)}
+  },
+  outputFields: {
+    changedUser: {
+      type: userType,
+      resolve: ({localUserId}) => getUser(localUserId)
+    }
+  },
+  mutateAndGetPayload: ({itemId, user}) => {
+    let localUserId = parseFloat(fromGlobalId(user).id);
+    let localTodoId = parseFloat(fromGlobalId(itemId).id);
+    deleteTodo(localTodoId, localUserId);
+    return {localUserId};
+  }
+});
+
+// TODO: EditTodoMutation
+const EditTodoMutation = mutationWithClientMutationId({
+  name: 'EditTodo',
+  inputFields: {
+    todoId: {type: new GraphQLNonNull(GraphQLID)},
+    user: {type: new GraphQLNonNull(GraphQLID)},
+    content: {type: new GraphQLNonNull(GraphQLString)}
+  },
+  outputFields: {
+    changedUser: {
+      type: userType,
+      resolve: ({localUserId}) => getUser(localUserId)
+    }
+  },
+  mutateAndGetPayload: ({todoId, user, content}) => {
+    let localUserId = parseFloat(fromGlobalId(user).id);
+    let localTodoId = parseFloat(fromGlobalId(todoId).id);
+    editTodo(localTodoId, content);
+    return {localUserId};
+  }
+});
+
 
 /**
  * This is the type that will be the root of our mutations,
@@ -128,7 +209,9 @@ var queryType = new GraphQLObjectType({
 var mutationType = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    // Add your own mutations here
+    addTodo: AddTodoMutation,
+    deleteTodo: DeleteTodoMutation,
+    editTodo: EditTodoMutation
   })
 });
 
@@ -139,5 +222,5 @@ var mutationType = new GraphQLObjectType({
 export var Schema = new GraphQLSchema({
   query: queryType,
   // Uncomment the following after adding some mutation fields:
-  // mutation: mutationType
+  mutation: mutationType
 });

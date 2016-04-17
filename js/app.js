@@ -10,6 +10,7 @@ ReactDOM.render(
   <Relay.RootContainer
     Component={App}
     route={new AppHomeRoute()}
+    onReadyStateChange={({error}) => { if (error) console.error(error) }}
   />,
   document.getElementById('root')
 );
