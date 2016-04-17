@@ -46,16 +46,24 @@ function addTodo(userId, content) {
 }
 
 function getTodo(id) {
-  return todoItems.find((todo) => todo.id === id);
+  return todoItems.find((todo) => todo.id == id);
 }
+
 function editTodo(id, content) {
-  //TODO: get the todo + replace its content + (eventually update the timestamp)
+  let todo = getTodo(id);
+  todo.content = content;
+  todo.time = new Date().toISOString();
 }
+
 function deleteTodo(id, userId) {
-  delete todoItems[id];
-  let user = getUser(userId);
-  return user.todos.splice(user.todos.indexOf(id), 1);
+  todoItems.forEach((todo, i, thisArray) => {
+    if (todo.id == id) thisArray.splice(i, 1);
+  });
+  return users.find((user) => {
+    if (user.id == userId) user.todos.splice(user.todos.indexOf(id), 1);
+  });
 }
+
 function getTodosByUser(id) {
   let user = getUser(id);
   return todoItems.filter((item)=> {

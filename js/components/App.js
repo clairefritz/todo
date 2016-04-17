@@ -4,6 +4,7 @@ import TodoItem from './TodoItem';
 import TodoCount from './TodoCount';
 import TodoInput from './TodoInput';
 import AddTodoMutation from '../mutations/AddTodoMutation';
+import EditTodoMutation from '../mutations/EditTodoMutation';
 import DeleteTodoMutation from '../mutations/DeleteTodoMutation';
 
 
@@ -26,6 +27,13 @@ class App extends React.Component {
       user: this.props.user
     }));
   };
+  _editTodo = (todoId, content) => {
+    Relay.Store.commitUpdate(new EditTodoMutation({
+      todoId: todoId,
+      user: this.props.user,
+      content: content
+    }));
+  };
   render() {
     return (
       <div className="row app">
@@ -33,10 +41,12 @@ class App extends React.Component {
           <TodoCount count={this.props.user.todos.edges.length}/>
           <ul className="row todo-list">
             {this.props.user.todos.edges.map(({node}) =>
-              <TodoItem key={node.id} todo={node} user={this.props.user} deleteTodo={this._deleteTodo}/>
+              <TodoItem key={node.id} todo={node} user={this.props.user} deleteTodo={this._deleteTodo} editTodo={this._editTodo}/>
             )}
           </ul>
-          <TodoInput handleChange={this._handleChange}/>
+          <div className="container">
+            <TodoInput submitTodo={this._submitTodo} layout="bottom"/>
+          </div>
         </div>
       </div>
     );
@@ -63,7 +73,8 @@ export default Relay.createContainer(App, {
           },
         },
         ${AddTodoMutation.getFragment('user')},
-        ${DeleteTodoMutation.getFragment('user')}
+        ${DeleteTodoMutation.getFragment('user')},
+        ${EditTodoMutation.getFragment('user')}
       }
     `
   }

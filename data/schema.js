@@ -153,7 +153,7 @@ const AddTodoMutation = mutationWithClientMutationId({
   // 1. proceed to updating the stored data
   // 2. return the payload that outputFields will need
   mutateAndGetPayload: ({user, content}) => {
-    let userId = fromGlobalId(user).id;
+    let userId = parseFloat(fromGlobalId(user).id);
     addTodo(userId, content);
     return {userId};
   }
@@ -172,8 +172,8 @@ const DeleteTodoMutation = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: ({itemId, user}) => {
-    let localUserId = fromGlobalId(user).id;
-    let localTodoId = fromGlobalId(itemId).id;
+    let localUserId = parseFloat(fromGlobalId(user).id);
+    let localTodoId = parseFloat(fromGlobalId(itemId).id);
     deleteTodo(localTodoId, localUserId);
     return {localUserId};
   }
@@ -182,9 +182,23 @@ const DeleteTodoMutation = mutationWithClientMutationId({
 // TODO: EditTodoMutation
 const EditTodoMutation = mutationWithClientMutationId({
   name: 'EditTodo',
-  inputFields: {},
-  outputFields: {},
-  mutateAndGetPayload: ()=> {}
+  inputFields: {
+    todoId: {type: new GraphQLNonNull(GraphQLID)},
+    user: {type: new GraphQLNonNull(GraphQLID)},
+    content: {type: new GraphQLNonNull(GraphQLString)}
+  },
+  outputFields: {
+    changedUser: {
+      type: userType,
+      resolve: ({localUserId}) => getUser(localUserId)
+    }
+  },
+  mutateAndGetPayload: ({todoId, user, content}) => {
+    let localUserId = parseFloat(fromGlobalId(user).id);
+    let localTodoId = parseFloat(fromGlobalId(todoId).id);
+    editTodo(localTodoId, content);
+    return {localUserId};
+  }
 });
 
 
